@@ -1,0 +1,35 @@
+name: "ensure-commits-message-jira-ticket"
+description: "checks that all commits in a pull request contain a jira ticket"
+inputs:
+  base-branch:
+    description: "name of the branch where the pull request goes to"
+    required: true
+  pr-branch:
+    description: "name of the branch where the pull request comes from"
+    required: true
+  ignore-pr-from-branches:
+    description: | 
+      List of strings containing regular expressions for PR branch names to ignore.
+      Each regular expression needs to have at least 3 consecutive alphanumeric characters.
+      Input samples:
+        - Multiline input parameter:
+          ...
+          ignore-pr-from-branches:
+            snyk-*
+            other-branch-regex
+          ...
+        - Delimited list:
+          - space: 'snyk-* other-branch-regex'
+          - semicolon: 'snyk-*;other-branch-regex'
+          - comma: 'snyk-*,other-branch-regex'
+        - Json array: '[ \"snyk-*\", \"other-branch-regex\" ]' 
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        node ${{ github.action_path }}/ensure-commits-message-jira-ticket.js \
+          "${{ inputs.base-branch }}" \
+          "${{ inputs.pr-branch }}" \
+          "${{ inputs.ignore-pr-from-branches }}"
